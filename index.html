@@ -142,7 +142,7 @@
     <p class="subtitle">Sila isi maklumat kerosakan di bawah dengan lengkap</p>
 
     <!-- Sila tukar 'URL_WEB_APP_GOOGLE_SHEETS_ANDA' kepada URL Google Apps Script yang sebenar -->
-    <form id="aduanForm" action="URL_WEB_APP_GOOGLE_SHEETS_ANDA" method="POST">
+    <form id="aduanForm" action="https://script.google.com/macros/s/AKfycbyqALII63mHmNy8i-qfnW_hkpV6ZiPsN4YS9HbhDVcYuCPUnbTdlm0u3OJitbrK_f5d-A/exec" method="POST">
         
         <!-- Info Dokumen -->
         <div class="form-row">
@@ -283,7 +283,7 @@
     document.getElementById('aduanForm').addEventListener('submit', function(e) {
         const actionUrl = this.getAttribute('action');
         
-        if (actionUrl === 'URL_WEB_APP_GOOGLE_SHEETS_ANDA') {
+        if (actionUrl === 'https://script.google.com/macros/s/AKfycbyqALII63mHmNy8i-qfnW_hkpV6ZiPsN4YS9HbhDVcYuCPUnbTdlm0u3OJitbrK_f5d-A/exec') {
             e.preventDefault();
             alert('⚙️ Sistem Mengesan Sediakan Sambungan:\n\nSila gantikan "URL_WEB_APP_GOOGLE_SHEETS_ANDA" di dalam kod HTML dengan URL Web App daripada Google Apps Script anda untuk menghantar data ke Google Sheets.');
             return;
