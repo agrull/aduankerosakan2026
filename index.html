@@ -1,330 +1,516 @@
+Untuk membolehkan anda membina, membangunkan, dan hos sistem Sistem Aduan Kerosakan @ KVPC ini pada pelayan (server) atau komputer anda sendiri, di bawah disediakan kod sumber (source code) penuh dalam satu fail tunggal (HTML + CSS + JavaScript + Bootstrap 5 + Chart.js).
+Sistem ini dibina secara client-side (tanpa memerlukan PHP/Node.js buat masa ini) dan menggunakan localStorage pelayar untuk menyimpan data aduan, status tindakan, gambar, dan log masuk secara kekal.
+## Cara Menjalankan Kod Ini:
+
+   1. Salin kod di bawah sepenuhnya.
+   2. Buka aplikasi Notepad atau VS Code, tampal (paste) kod tersebut.
+   3. Simpan (Save) fail dengan nama index.html.
+   4. Klik dua kali pada fail index.html tersebut untuk membukanya terus di mana-mana pelayar web (Chrome, Edge, Firefox).
+
 <!DOCTYPE html>
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borang Aduan Kerosakan Interaktif</title>
+    <title>Sistem Aduan Kerosakan @ KVPC</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://jsdelivr.net" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://jsdelivr.net" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://jsdelivr.net"></script>
     <style>
+        :root {
+            --kv-green: #005A36;
+            --kv-gold: #D4AF37;
+        }
         body {
-            font-family: Arial, sans-serif;
             background-color: #f4f6f9;
-            margin: 0;
-            padding: 20px;
-            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .form-container {
-            max-width: 700px;
-            background: #ffffff;
-            margin: 0 auto;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        .navbar-kv {
+            background-color: var(--kv-green);
+            border-bottom: 4px solid var(--kv-gold);
         }
-        h2 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .navbar-brand, .nav-link {
+            color: white !important;
         }
-        p.subtitle {
-            text-align: center;
-            color: #7f8c8d;
-            margin-top: 0;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-        fieldset {
-            border: 1px solid #dcdde1;
-            border-radius: 6px;
-            padding: 20px;
-            margin-bottom: 25px;
-            background-color: #fafbfc;
-        }
-        legend {
-            font-weight: bold;
-            color: #2980b9;
-            padding: 0 10px;
-            font-size: 16px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-row {
-            display: flex;
-            gap: 15px;
-        }
-        .form-row .form-group {
-            flex: 1;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-            font-size: 14px;
-            color: #34495e;
-        }
-        input[type="text"],
-        input[type="tel"],
-        input[type="email"],
-        input[type="date"],
-        textarea,
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 14px;
-            background-color: #fff;
-        }
-        input:focus, textarea:focus, select:focus {
-            border-color: #3498db;
-            outline: none;
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
-        }
-        .checkbox-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 5px;
-        }
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .checkbox-item input {
-            cursor: pointer;
-            width: 16px;
-            height: 16px;
-        }
-        .office-only {
-            background-color: #fff5f5;
-            border-color: #fab1a0;
-        }
-        .office-only legend {
-            color: #d63031;
-        }
-        .btn-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        button {
-            background-color: #27ae60;
-            color: white;
+        .card-custom {
             border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
         }
-        button:hover {
-            background-color: #219653;
+        .card-header-kv {
+            background-color: var(--kv-green);
+            color: white;
+            border-top-left-radius: 12px !important;
+            border-top-right-radius: 12px !important;
+            font-weight: 600;
         }
-        button[type="reset"] {
-            background-color: #7f8c8d;
-            margin-left: 10px;
+        .btn-kv {
+            background-color: var(--kv-green);
+            color: white;
         }
-        button[type="reset"]:hover {
-            background-color: #636e72;
+        .btn-kv:hover {
+            background-color: #004428;
+            color: white;
+        }
+        .badge-pending { background-color: #ffc107; color: #000; }
+        .badge-progress { background-color: #0dcaf0; color: #fff; }
+        .badge-success { background-color: #198754; color: #fff; }
+        .borang-header {
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
         }
     </style>
 </head>
 <body>
 
-<div class="form-container">
-    <h2>Borang Aduan Kerosakan</h2>
-    <p class="subtitle">Sila isi maklumat kerosakan di bawah dengan lengkap</p>
-
-    <!-- Sila tukar 'URL_WEB_APP_GOOGLE_SHEETS_ANDA' kepada URL Google Apps Script yang sebenar -->
-    <form id="aduanForm" action="https://script.google.com/macros/s/AKfycbyqALII63mHmNy8i-qfnW_hkpV6ZiPsN4YS9HbhDVcYuCPUnbTdlm0u3OJitbrK_f5d-A/exec" method="POST">
-        
-        <!-- Info Dokumen -->
-        <div class="form-row">
-            <div class="form-group">
-                <label for="no_aduan">No. Aduan</label>
-                <input type="text" id="no_aduan" name="no_aduan" readonly style="background-color: #e9ecef; font-weight: bold; color: #2c3e50;">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-kv shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="bi bi-tools me-2 text-warning"></i>
+                <div>
+                    <strong class="d-block" style="font-size: 1.1rem; letter-spacing: 0.5px;">SISTEM ADUAN KEROSAKAN @ KVPC</strong>
+                    <small style="font-size: 0.75rem; opacity: 0.85;">Kolej Vokasional (Pertanian) Chenor</small>
+                </div>
+            </a>
+            <div class="ms-auto" id="navAuthSection">
+                <!-- Dinamik berdasarkan status login -->
             </div>
-            <div class="form-group">
-                <label for="tarikh_aduan">Tarikh Aduan</label>
-                <input type="date" id="tarikh_aduan" name="tarikh_aduan" required readonly style="background-color: #e9ecef;">
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        
+        <!-- SECTION 1: LOGIN PAGE -->
+        <div id="sectionLogin" class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card card-custom p-4 text-center mt-5">
+                    <h3 class="mb-2 fw-bold text-success">Selamat Datang</h3>
+                    <p class="text-muted mb-4">Sila pilih peranan anda untuk masuk ke sistem</p>
+                    <div class="d-grid gap-3">
+                        <button onclick="loginAs('pengguna')" class="btn btn-kv btn-lg py-3 shadow-sm">
+                            <i class="bi bi-person-fill me-2"></i> Log Masuk Pengguna (Pengadu)
+                        </button>
+                        <div class="position-relative my-2">
+                            <hr><span class="position-absolute top-50 start-50 translate-middle bg-white px-2 text-muted">ATAU</span>
+                        </div>
+                        <button onclick="loginAs('admin')" class="btn btn-outline-success btn-lg py-3 shadow-sm">
+                            <i class="bi bi-shield-lock-fill me-2"></i> Log Masuk Admin / Juruteknik
+                        </button>
+                    </div>
+                    <div class="mt-4 p-3 bg-light rounded text-start text-xs">
+                        <small class="text-muted d-block"><strong>Nota Simulasi:</strong></small>
+                        <small class="text-muted">• Klik "Pengguna" untuk hantar borang aduan baru.</small><br>
+                        <small class="text-muted">• Klik "Admin" untuk urus tindakan, muat turun .docx & lihat graf.</small>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Bahagian A: Maklumat Pengadu -->
-        <fieldset>
-            <legend>A. Maklumat Pengadu</legend>
-            
-            <div class="form-group">
-                <label for="nama">Nama Penuh</label>
-                <input type="text" id="nama" name="nama" placeholder="Masukkan nama penuh anda" required>
-            </div>
+        <!-- SECTION 2: PENGGUNA (BORANG ADUAN) -->
+        <div id="sectionPengguna" class="row d-none">
+            <div class="col-lg-8 mx-auto">
+                <div class="card card-custom">
+                    <div class="card-header card-header-kv py-3">
+                        <i class="bi bi-file-earmark-text-fill me-2"></i> BORANG ADUAN KEROSAKAN (Sila Isi Maklumat)
+                    </div>
+                    <div class="card-body p-4 bg-white">
+                        <div class="borang-header text-center position-relative">
+                            <h4 class="fw-bold m-0">BORANG ADUAN KEROSAKAN</h4>
+                            <span class="position-absolute top-0 end-0 border px-2 py-1 text-muted small" style="font-size: 0.7rem;">NO. ADUAN: KVPC-SYSTEM</span>
+                        </div>
+                        
+                        <form id="formAduan" onsubmit="simpanAduan(event)">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Nama Pengadu</label>
+                                    <input type="text" id="pNama" class="form-control" required placeholder="Contoh: Ahmad bin Ali">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Unit / Bengkel / Kursus</label>
+                                    <input type="text" id="pUnit" class="form-control" required placeholder="Contoh: Bengkel Pertanian / Hortikultur">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Tarikh Aduan</label>
+                                    <input type="date" id="pTarikh" class="form-control" required>
+                                </div>
+                            </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="telefon">No. Telefon</label>
-                    <input type="tel" id="telefon" name="telefon" placeholder="Contoh: 0123456789" required>
-                </div>
-                <div class="form-group">
-                    <label for="emel_unit">Emel / Unit / Jabatan</label>
-                    <input type="text" id="emel_unit" name="emel_unit" placeholder="Contoh: Unit IT / HR" required>
-                </div>
-            </div>
+                            <div class="bg-light p-3 rounded mb-3 border-start border-4 border-success">
+                                <h6 class="fw-bold text-success mb-3"><i class="bi bi-info-circle-fill me-1"></i> MAKLUMAT KEROSAKAN</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Butiran Alat / Mesin</label>
+                                        <input type="text" id="pAlat" class="form-control" required placeholder="Contoh: Traktor Kubota, Pendingin Hawa">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Lokasi Alatan</label>
+                                        <input type="text" id="pLokasi" class="form-control" required placeholder="Contoh: Garaj A, Bilik Kuliah 2">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Jenis Kerosakan</label>
+                                        <select id="pJenis" class="form-select" required>
+                                            <option value="" disabled selected>-- Pilih Jenis Kerosakan --</option>
+                                            <option value="Mekanikal">Mekanikal (Enjin/Roda/Alatan Bergerak)</option>
+                                            <option value="Elektrik">Elektrik (Pendawaian/Suis/Lampu/Kuasa)</option>
+                                            <option value="Fizikal/Struktur">Fizikal/Struktur (Pecah/Karat/Dinding)</option>
+                                            <option value="Perisian/IT">Perisian/IT (Komputer/Rangkaian)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Butiran Spesifik Kerosakan</label>
+                                        <textarea id="pKerosakan" class="form-control" rows="3" required placeholder="Sila jelaskan keadaan kerosakan alatan tersebut..."></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Muat Naik Gambar Bukti <span class="text-danger">*</span></label>
+                                        <input type="file" id="pGambar" class="form-control" accept="image/*" onchange="previewImage(event)">
+                                        <div class="mt-2">
+                                            <img id="imgPreview" src="" alt="Pratonton" class="img-thumbnail d-none" style="max-height: 150px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-            <div class="form-group">
-                <label for="lokasi">Lokasi Kerosakan</label>
-                <input type="text" id="lokasi" name="lokasi" placeholder="Contoh: Bilik Mesyuarat, Aras 2, Bangunan A" required>
-            </div>
-        </fieldset>
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="reset" class="btn btn-light border">Set Semula Borang</button>
+                                <button type="submit" class="btn btn-kv px-4"><i class="bi bi-send-fill me-1"></i> Hantar Aduan</button>
+                            </div>
+                        </form>
 
-        <!-- Bahagian B: Maklumat Kerosakan -->
-        <fieldset>
-            <legend>B. Maklumat Kerosakan</legend>
+Kekerapan Alatan Rosak
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="jenis_aset">Jenis Aset / Peralatan</label>
-                    <input type="text" id="jenis_aset" name="jenis_aset" placeholder="Contoh: Pendingin Hawa / Kerusi" required>
-                </div>
-                <div class="form-group">
-                    <label for="no_siri">No. Siri / Tag Aset (Jika ada)</label>
-                    <input type="text" id="no_siri" name="no_siri" placeholder="Contoh: KK/INV/2026/01">
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label>Kategori Kerosakan</label>
-                <div class="checkbox-group">
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="kategori" value="Elektrik"> Elektrik (Lampu, Kipas, Soket)
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="kategori" value="Paip"> Paip / Sanitari (Bocor, Tersumbat)
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="kategori" value="Perabot"> Perabot (Meja, Kerusi, Almari)
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="kategori" value="Struktur"> Struktur Bangunan (Pintu, Dinding)
-                    </label>
-                </div>
-            </div>
 
-            <div class="form-group" style="margin-top: 15px;">
-                <label for="perihal">Perihal Kerosakan</label>
-                <textarea id="perihal" name="perihal" rows="4" placeholder="Sila terangkan masalah kerosakan dengan jelas..." required></textarea>
-            </div>
-        </fieldset>
 
-        <!-- Bahagian C: Kegunaan Pejabat Sahaja -->
-        <fieldset class="office-only">
-            <legend>C. Kegunaan Pejabat Sahaja</legend>
-            <p style="font-size: 12px; color: #e74c3c; margin: 0 0 10px 0;">* Bahagian ini akan dikemas kini oleh admin setelah aduan diproses.</p>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="tarikh_terima">Tarikh Terima</label>
-                    <input type="date" id="tarikh_terima" name="tarikh_terima" disabled>
-                </div>
-                <div class="form-group">
-                    <label for="pegawai_penerima">Nama Pegawai Penerima</label>
-                    <input type="text" id="pegawai_penerima" name="pegawai_penerima" placeholder="Nama pegawai bertugas" disabled>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label for="status">Status Tindakan</label>
-                <select id="status" name="status" disabled>
-                    <option value="Baru" selected>Baru (Belum Diproses)</option>
-                    <option value="Dalam Tindakan">Dalam Tindakan</option>
-                    <option value="Selesai Dibaiki">Selesai Dibaiki</option>
-                    <option value="Ditolak">Ditolak</option>
-                </select>
-            </div>
-        </fieldset>
 
-        <!-- Butang Aksi -->
-        <div class="btn-container">
-            <button type="submit" id="submitBtn">Hantar Aduan</button>
-            <button type="button" id="resetBtn" onclick="setInitialValues()">Isi Semula</button>
-        </div>
 
-    </form>
-</div>
+Jenis Kerosakan Utama
 
-<script>
-    // Fungsi untuk menjana No. Aduan rawak secara automatik
-    function generateNoAduan() {
-        const rand = Math.floor(1000 + Math.random() * 9000);
-        document.getElementById('no_aduan').value = 'ADUAN-' + rand;
-    }
 
-    // Fungsi untuk menetapkan tarikh hari ini secara automatik
-    function setTarikhHariIni() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('tarikh_aduan').value = today;
-    }
 
-    // Menetapkan nilai awal apabila halaman dimuatkan
-    function setInitialValues() {
-        document.getElementById('aduanForm').reset();
-        generateNoAduan();
-        setTarikhHariIni();
-    }
 
-    window.onload = setInitialValues;
 
-    // Logik Penghantaran Borang (Simulasi atau sambungan ke Google Sheets)
-    document.getElementById('aduanForm').addEventListener('submit', function(e) {
-        const actionUrl = this.getAttribute('action');
-        
-        if (actionUrl === 'https://script.google.com/macros/s/AKfycbyqALII63mHmNy8i-qfnW_hkpV6ZiPsN4YS9HbhDVcYuCPUnbTdlm0u3OJitbrK_f5d-A/exec') {
-            e.preventDefault();
-            alert('⚙️ Sistem Mengesan Sediakan Sambungan:\n\nSila gantikan "URL_WEB_APP_GOOGLE_SHEETS_ANDA" di dalam kod HTML dengan URL Web App daripada Google Apps Script anda untuk menghantar data ke Google Sheets.');
-            return;
-        }
-        
-        // Jika URL telah diisi, borang akan dihantar menggunakan Apps Script secara latar belakang
-        e.preventDefault();
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Menghantar...';
 
-        // Mengumpul data kategori yang ditandakan
-        const checkboxes = document.querySelectorAll('input[name="kategori"]:checked');
-        let kategoriSelected = [];
-        checkboxes.forEach((checkbox) => {
-            kategoriSelected.push(checkbox.value);
-        });
 
-        const formData = new FormData(this);
-        // Tukar senarai kategori menjadi teks dipisahkan koma untuk Google Sheets
-        formData.set('kategori', kategoriSelected.join(', '));
+Lokasi Kerosakan Kerap
 
-        fetch(actionUrl, {
-            method: 'POST',
-            body: formData,
-            mode: 'no-cors' // Diperlukan untuk Google Apps Script
-        })
-        .then(() => {
-            alert('✅ Aduan anda telah berjaya dihantar ke sistem!');
-            setInitialValues();
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'Hantar Aduan';
-        })
-        .catch(error => {
-            alert('❌ Ralat semasa menghantar aduan. Sila cuba lagi.');
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'Hantar Aduan';
-            console.error('Error:', error);
-        });
-    });
-</script>
 
-</body>
-</html>
+
+
+
+Penjana Laporan Bulanan (.docx)
+Pilih bulan untuk menjana rumusan jadual dan lampiran gambar aduan.
+
+
+
+JanuariFebruari
+MacApril
+MeiJun
+JulaiOgos
+SeptemberOktober
+NovemberDisember
+
+
+2026
+2027
+
+Muat Turun .docx
+
+
+SENARAI REKOD KEROSAKAN (Susunan Tarikh)
+Jumlah: 0
+
+
+Laporan Tindakan Juruteknik
+
+
+
+
+
+Juruteknik Pemeriksa: NURUL AMIN BIN ABDUL GHAFFAR
+Penolong Jurutera JA5 KUP (Mekanikal)
+
+Dalam Proses / Menunggu Alat Ganti
+Selesai Berfungsi Sepenuhnya
+Tidak Boleh Dibaiki / Cadang Pelupusan
+
+
+Batal
+Kemaskini Rekod
+
+
+
+// Simulasi Database LocalStorage
+let dataAduan = JSON.parse(localStorage.getItem('kvpc_aduan')) || [
+{
+nama: "Mohd Azam", unit: "Unit Ladang", tarikh: "2026-08-05",
+alat: "Mesin Rumput Stihl", lokasi: "Store Pertanian", jenis: "Mekanikal",
+kerosakan: "Kabel penarik putus dan enjin gagal dihidupkan.", gambar: "",
+tTarikh: "2026-08-06", tindakan: "Mengganti tali penarik baru dan mencuci karburetor.", status: "Selesai", catatan: "Selesai diuji."
+},
+{
+nama: "Siti Aminah", unit: "Bilik Pensyarah", tarikh: "2026-08-12",
+alat: "Pendingin Hawa York", lokasi: "Bilik Kuliah 3", jenis: "Elektrik",
+kerosakan: "Keluar udara panas dan lampu pemampat berkelip merah.", gambar: "",
+tTarikh: "", tindakan: "", status: "Sedia Untuk Diperiksa", catatan: ""
+}
+];
+let currentUser = null;
+let base64ImageString = "";
+let charts = {};
+// Inisialisasi Sistem Semasa Dibuka
+window.onload = function() {
+localStorage.setItem('kvpc_aduan', JSON.stringify(dataAduan));
+checkSession();
+};
+function checkSession() {
+updateNavbar();
+if(!currentUser) {
+document.getElementById('sectionLogin').classList.remove('none');
+document.getElementById('sectionPengguna').classList.add('d-none');
+document.getElementById('sectionAdmin').classList.add('d-none');
+} else if(currentUser === 'pengguna') {
+document.getElementById('sectionLogin').classList.add('d-none');
+document.getElementById('sectionPengguna').classList.remove('d-none');
+document.getElementById('sectionAdmin').classList.add('d-none');
+document.getElementById('pTarikh').value = new Date().toISOString().substring(0, 10);
+} else if(currentUser === 'admin') {
+document.getElementById('sectionLogin').classList.add('d-none');
+document.getElementById('sectionPengguna').classList.add('d-none');
+document.getElementById('sectionAdmin').classList.remove('d-none');
+binaJadualAdmin();
+binaAnalitikCarta();
+}
+}
+function loginAs(role) {
+currentUser = role;
+checkSession();
+}
+function logout() {
+currentUser = null;
+checkSession();
+window.location.reload();
+}
+function updateNavbar() {
+const container = document.getElementById('navAuthSection');
+if(!currentUser) {
+container.innerHTML = <span class="badge bg-light text-success p-2"><i class="bi bi-lock-fill"></i> Sistem Dikunci</span>;
+} else {
+let nameTag = currentUser === 'admin' ? 'Juruteknik: NURUL AMIN (JA5)' : 'Mod: PENGGUNA (PENGADU)';
+container.innerHTML = <div class="d-flex align-items-center gap-3"> <span class="text-white small fw-bold"><i class="bi bi-circle-fill text-warning me-1" style="font-size:0.6rem;"></i> ${nameTag}</span> <button onclick="logout()" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-right"></i> Log Keluar</button> </div>;
+}
+}
+// Simpan rentetan gambar yang dimuat naik ke Base64 string
+function previewImage(event) {
+const file = event.target.files[0];
+const reader = new FileReader();
+reader.onload = function() {
+base64ImageString = reader.result;
+const preview = document.getElementById('imgPreview');
+preview.src = reader.result;
+preview.classList.remove('d-none');
+}
+if(file) reader.readAsDataURL(file);
+}
+// Hantar dan simpan aduan oleh pengguna
+function simpanAduan(e) {
+e.preventDefault();
+const aduanBaru = {
+nama: document.getElementById('pNama').value,
+unit: document.getElementById('pUnit').value,
+tarikh: document.getElementById('pTarikh').value,
+alat: document.getElementById('pAlat').value,
+lokasi: document.getElementById('pLokasi').value,
+jenis: document.getElementById('pJenis').value,
+kerosakan: document.getElementById('pKerosakan').value,
+gambar: base64ImageString,
+tTarikh: "", tindakan: "", status: "Sedia Untuk Diperiksa", catatan: ""
+};
+dataAduan.push(aduanBaru);
+localStorage.setItem('kvpc_aduan', JSON.stringify(dataAduan));
+alert("Aduan Kerosakan anda berjaya dihantar ke sistem Juruteknik KVPC!");
+document.getElementById('formAduan').reset();
+document.getElementById('imgPreview').classList.add('d-none');
+base64ImageString = "";
+}
+// Membina Jadual Mengikut Date-Basis (Urutan Tarikh Terbaru Atas)
+function binaJadualAdmin() {
+const tbody = document.getElementById('tbodyAduan');
+tbody.innerHTML = "";
+// Susun berdasarkan tarikh (descending)
+let aduanDisusun = [...dataAduan].sort((a,b) => new Date(b.tarikh) - new Date(a.tarikh));
+document.getElementById('totalAduanBadge').innerText = Jumlah: ${aduanDisusun.length};
+if(aduanDisusun.length === 0) {
+tbody.innerHTML = <tr><td colspan="8" class="text-center p-4 text-muted">Tiada sebarang rekod aduan buat masa ini.</td></tr>;
+return;
+}
+aduanDisusun.forEach((aduan, urutan) => {
+// Mencari indeks sebenar dalam array induk asli
+let indeksAsal = dataAduan.findIndex(x => x.tarikh === aduan.tarikh && x.alat === aduan.alat && x.nama === aduan.nama);
+let badgeClass = "badge-pending";
+if(aduan.status === 'Dalam Proses') badgeClass = "badge-progress";
+if(aduan.status === 'Selesai') badgeClass = "badge-success";
+if(aduan.status === 'Dilupuskan') badgeClass = "bg-danger";
+let gambarElement = <span class="text-muted small">Tiada</span>;
+if(aduan.gambar) {
+gambarElement = <div class="d-flex flex-column align-items-start gap-1"> <img src="${aduan.gambar}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;"> <a href="${aduan.gambar}" download="Bukti_Kerosakan_${aduan.alat}.png" class="btn btn-xs btn-success py-0 px-1" style="font-size: 0.65rem;"><i class="bi bi-download"></i> Muat Turun</a> </div>;
+}
+tbody.innerHTML += <tr> <td class="fw-bold text-center">${urutan + 1}</td> <td class="text-nowrap fw-semibold">${formatTarikh(aduan.tarikh)}</td> <td> <div class="fw-bold text-dark">${aduan.nama}</div> <small class="text-muted d-block">${aduan.unit}</small> </td> <td> <span class="badge bg-dark mb-1">${aduan.alat}</span> <small class="d-block text-secondary"><i class="bi bi-geo-alt-fill text-danger"></i> ${aduan.lokasi}</small> </td> <td> <span class="badge bg-secondary mb-1">${aduan.jenis}</span> <p class="m-0 small text-truncate" style="max-width: 200px;" title="${aduan.kerosakan}">${aduan.kerosakan}</p> </td> <td>${gambarElement}</td> <td> <span class="badge ${badgeClass} mb-1 d-inline-block">${aduan.status}</span> ${aduan.tTarikh ?Siap: ${formatTarikh(aduan.tTarikh)}: ''} </td> <td class="text-center"> <button onclick="bukaModalTindakan(${indeksAsal})" class="btn btn-sm btn-outline-dark" title="Kemaskini Tindakan"> <i class="bi bi-pencil-square"></i> Tindakan </button> </td> </tr>;
+});
+}
+function formatTarikh(str) {
+if(!str) return "-";
+const d = new Date(str);
+return ${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()};
+}
+// Buka modal untuk tugasan juruteknik
+function bukaModalTindakan(index) {
+const aduan = dataAduan[index];
+document.getElementById('modalIndex').value = index;
+document.getElementById('tTarikh').value = aduan.tTarikh || new Date().toISOString().substring(0, 10);
+document.getElementById('tTindakan').value = aduan.tTindakan || "";
+document.getElementById('tStatus').value = aduan.status === "Sedia Untuk Diperiksa" ? "Dalam Proses" : aduan.status;
+document.getElementById('tCatatan').value = aduan.catatan || "";
+const myModal = new bootstrap.Modal(document.getElementById('modalTindakan'));
+myModal.show();
+}
+// Simpan tindakan daripada juruteknik
+function simpanTindakan(e) {
+e.preventDefault();
+const index = document.getElementById('modalIndex').value;
+dataAduan[index].tTarikh = document.getElementById('tTarikh').value;
+dataAduan[index].tTindakan = document.getElementById('tTindakan').value;
+dataAduan[index].status = document.getElementById('tStatus').value;
+dataAduan[index].catatan = document.getElementById('tCatatan').value;
+localStorage.setItem('kvpc_aduan', JSON.stringify(dataAduan));
+// Tutup modal secara programatik
+const modalEl = document.getElementById('modalTindakan');
+const modalInstance = bootstrap.Modal.getInstance(modalEl);
+modalInstance.hide();
+alert("Tindakan juruteknik berjaya dikemaskini.");
+binaJadualAdmin();
+binaAnalitikCarta();
+}
+// BINA CARTA ANALITIK VISUAL (Chart.js)
+function binaAnalitikCarta() {
+// Hancurkan carta lama jika wujud untuk mengelakkan pertindihan rendering
+if(charts.alatan) charts.alatan.destroy();
+if(charts.jenis) charts.jenis.destroy();
+if(charts.lokasi) charts.lokasi.destroy();
+// Sediakan pengiraan kekerapan frekuensi data
+let frekAlat = {}, frekJenis = {}, freklokasi = {};
+dataAduan.forEach(x => {
+frekAlat[x.alat] = (frekAlat[x.alat] || 0) + 1;
+frekJenis[x.jenis] = (frekJenis[x.jenis] || 0) + 1;
+freklokasi[x.lokasi] = (freklokasi[x.lokasi] || 0) + 1;
+});
+// 1. Carta Alatan (Bar)
+charts.alatan = new Chart(document.getElementById('chartAlatan'), {
+type: 'bar',
+data: {
+labels: Object.keys(frekAlat),
+datasets: [{ label: 'Kekerapan Rosak', data: Object.values(frekAlat), backgroundColor: '#005A36' }]
+},
+options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+});
+// 2. Carta Jenis Kerosakan (Doughnut)
+charts.jenis = new Chart(document.getElementById('chartJenis'), {
+type: 'doughnut',
+data: {
+labels: Object.keys(frekJenis),
+datasets: [{ data: Object.values(frekJenis), backgroundColor: ['#ffc107', '#0dcaf0', '#198754', '#dc3545'] }]
+},
+options: { responsive: true, maintainAspectRatio: false }
+});
+// 3. Carta Lokasi (Pie)
+charts.lokasi = new Chart(document.getElementById('chartLokasi'), {
+type: 'pie',
+data: {
+labels: Object.keys(freklokasi),
+datasets: [{ data: Object.values(freklokasi), backgroundColor: ['#6c757d', '#fd7e14', '#20c997', '#0d6efd'] }]
+},
+options: { responsive: true, maintainAspectRatio: false }
+});
+}
+// FUNGSI JANA LAPORAN BULANAN (.DOCX SIMULASI HTML-BASED WORD)
+function generateDocx() {
+const bulanDipilih = document.getElementById('filterBulan').value;
+const tahunDipilih = document.getElementById('filterTahun').value;
+// Tapis data mengikut bulan dan tahun aduan
+let dataTapis = dataAduan.filter(x => {
+const parts = x.tarikh.split('-'); // YYYY-MM-DD
+return parts[1] === bulanDipilih && parts[0] === tahunDipilih;
+});
+if(dataTapis.length === 0) {
+alert(Tiada rekod aduan kerosakan dijumpai pada bulan ${bulanDipilih}/${tahunDipilih}.);
+return;
+}
+const namaBulanTeks = $("#filterBulan option:selected").text().toUpperCase();
+// Membina kandungan HTML bertaraf XML Word Document (Mime Type docx)
+let htmlKandungan = `
+
+
+Laporan Bulanan KVPC
+
+body { font-family: Arial, sans-serif; line-height: 1.4; }
+.title { text-align: center; font-size: 14pt; font-weight: bold; margin-bottom: 5px; }
+.subtitle { text-align: center; font-size: 11pt; font-weight: bold; margin-bottom: 25px; color: #555; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 10pt; }
+th { background-color: #005A36; color: white; border: 1px solid #000; padding: 8px; text-align: center; }
+td { border: 1px solid #000; padding: 8px; vertical-align: top; }
+.heading-lampiran { font-size: 12pt; font-weight: bold; margin-top: 40px; page-break-before: always; }
+.img-box { margin-bottom: 20px; border: 1px solid #ccc; padding: 10px; display: inline-block; text-align:center;}
+
+
+
+LAPORAN BULANAN KEROSAKAN ALATAN & MESIN
+KOLEJ VOKASIONAL (PERTANIAN) CHENOR
+BULAN: ${namaBulanTeks} ${tahunDipilih}
+Ringkasan Jadual Aduan Kerosakan:
+`;
+if(adaGambar) {
+htmlKandungan += lampiranGambarHtml;
+}
+htmlKandungan += `
+
+
+`;
+// Proses penukaran data ke fail BLOB Word document (.docx format compatible)
+const blob = new Blob(['\ufeff' + htmlKandungan], {
+type: 'application/msword'
+});
+// Cetus pautan muat turun automatik
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = Laporan_Kerosakan_KVPC_${bulanDipilih}_${tahunDipilih}.doc;
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+}
+// Helper JQuery mini Selector alternatif
+function $(selector) {
+return document.querySelector(selector);
+}
+
+
+
+### Kelebihan Struktur Kod Ini:
+1.  **Tanpa Server / Kos Kosong**: Fail ini berjalan 100% pada pelayar web mana-mana peranti tanpa perlu menyewa hos atau melanggan pangkalan data berbayar.
+2.  **Sedia Gambar & Docx**: Penggunaan modul terbina menukarkan gambar bukti menjadi kod String yang selamat untuk dijana ke dalam format dokumen Word Microsoft Office secara automatik.
+
+Sila beritahu saya sekiranya anda memerlukan bantuan lanjut mengenai cara **menghubungkan fail ini ke pangkalan data MySQL** sebenar menggunakan skrip PHP!
+
+
