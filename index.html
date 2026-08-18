@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borang Aduan Kerosakan Interaktif</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .form-container {
+            max-width: 700px;
+            background: #ffffff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        fieldset {
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background-color: #fafbfc;
+        }
+        legend {
+            font-weight: bold;
+            color: #2980b9;
+            padding: 0 10px;
+            font-size: 16px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #34495e;
+        }
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background-color: #fff;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .checkbox-item input {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+        .office-only {
+            background-color: #fff5f5;
+            border-color: #fab1a0;
+        }
+        .office-only legend {
+            color: #d63031;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #219653;
+        }
+        button[type="reset"] {
+            background-color: #7f8c8d;
+            margin-left: 10px;
+        }
+        button[type="reset"]:hover {
+            background-color: #636e72;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Borang Aduan Kerosakan</h2>
+    <p class="subtitle">Sila isi maklumat kerosakan di bawah dengan lengkap</p>
+
+    <!-- Sila tukar 'URL_WEB_APP_GOOGLE_SHEETS_ANDA' kepada URL Google Apps Script yang sebenar -->
+    <form id="aduanForm" action="URL_WEB_APP_GOOGLE_SHEETS_ANDA" method="POST">
+        
+        <!-- Info Dokumen -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="no_aduan">No. Aduan</label>
+                <input type="text" id="no_aduan" name="no_aduan" readonly style="background-color: #e9ecef; font-weight: bold; color: #2c3e50;">
+            </div>
+            <div class="form-group">
+                <label for="tarikh_aduan">Tarikh Aduan</label>
+                <input type="date" id="tarikh_aduan" name="tarikh_aduan" required readonly style="background-color: #e9ecef;">
+            </div>
+        </div>
+
+        <!-- Bahagian A: Maklumat Pengadu -->
+        <fieldset>
+            <legend>A. Maklumat Pengadu</legend>
+            
+            <div class="form-group">
+                <label for="nama">Nama Penuh</label>
+                <input type="text" id="nama" name="nama" placeholder="Masukkan nama penuh anda" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="telefon">No. Telefon</label>
+                    <input type="tel" id="telefon" name="telefon" placeholder="Contoh: 0123456789" required>
+                </div>
+                <div class="form-group">
+                    <label for="emel_unit">Emel / Unit / Jabatan</label>
+                    <input type="text" id="emel_unit" name="emel_unit" placeholder="Contoh: Unit IT / HR" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="lokasi">Lokasi Kerosakan</label>
+                <input type="text" id="lokasi" name="lokasi" placeholder="Contoh: Bilik Mesyuarat, Aras 2, Bangunan A" required>
+            </div>
+        </fieldset>
+
+        <!-- Bahagian B: Maklumat Kerosakan -->
+        <fieldset>
+            <legend>B. Maklumat Kerosakan</legend>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="jenis_aset">Jenis Aset / Peralatan</label>
+                    <input type="text" id="jenis_aset" name="jenis_aset" placeholder="Contoh: Pendingin Hawa / Kerusi" required>
+                </div>
+                <div class="form-group">
+                    <label for="no_siri">No. Siri / Tag Aset (Jika ada)</label>
+                    <input type="text" id="no_siri" name="no_siri" placeholder="Contoh: KK/INV/2026/01">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Kategori Kerosakan</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="kategori" value="Elektrik"> Elektrik (Lampu, Kipas, Soket)
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="kategori" value="Paip"> Paip / Sanitari (Bocor, Tersumbat)
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="kategori" value="Perabot"> Perabot (Meja, Kerusi, Almari)
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="kategori" value="Struktur"> Struktur Bangunan (Pintu, Dinding)
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="perihal">Perihal Kerosakan</label>
+                <textarea id="perihal" name="perihal" rows="4" placeholder="Sila terangkan masalah kerosakan dengan jelas..." required></textarea>
+            </div>
+        </fieldset>
+
+        <!-- Bahagian C: Kegunaan Pejabat Sahaja -->
+        <fieldset class="office-only">
+            <legend>C. Kegunaan Pejabat Sahaja</legend>
+            <p style="font-size: 12px; color: #e74c3c; margin: 0 0 10px 0;">* Bahagian ini akan dikemas kini oleh admin setelah aduan diproses.</p>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="tarikh_terima">Tarikh Terima</label>
+                    <input type="date" id="tarikh_terima" name="tarikh_terima" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="pegawai_penerima">Nama Pegawai Penerima</label>
+                    <input type="text" id="pegawai_penerima" name="pegawai_penerima" placeholder="Nama pegawai bertugas" disabled>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status Tindakan</label>
+                <select id="status" name="status" disabled>
+                    <option value="Baru" selected>Baru (Belum Diproses)</option>
+                    <option value="Dalam Tindakan">Dalam Tindakan</option>
+                    <option value="Selesai Dibaiki">Selesai Dibaiki</option>
+                    <option value="Ditolak">Ditolak</option>
+                </select>
+            </div>
+        </fieldset>
+
+        <!-- Butang Aksi -->
+        <div class="btn-container">
+            <button type="submit" id="submitBtn">Hantar Aduan</button>
+            <button type="button" id="resetBtn" onclick="setInitialValues()">Isi Semula</button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    // Fungsi untuk menjana No. Aduan rawak secara automatik
+    function generateNoAduan() {
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('no_aduan').value = 'ADUAN-' + rand;
+    }
+
+    // Fungsi untuk menetapkan tarikh hari ini secara automatik
+    function setTarikhHariIni() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('tarikh_aduan').value = today;
+    }
+
+    // Menetapkan nilai awal apabila halaman dimuatkan
+    function setInitialValues() {
+        document.getElementById('aduanForm').reset();
+        generateNoAduan();
+        setTarikhHariIni();
+    }
+
+    window.onload = setInitialValues;
+
+    // Logik Penghantaran Borang (Simulasi atau sambungan ke Google Sheets)
+    document.getElementById('aduanForm').addEventListener('submit', function(e) {
+        const actionUrl = this.getAttribute('action');
+        
+        if (actionUrl === 'URL_WEB_APP_GOOGLE_SHEETS_ANDA') {
+            e.preventDefault();
+            alert('⚙️ Sistem Mengesan Sediakan Sambungan:\n\nSila gantikan "URL_WEB_APP_GOOGLE_SHEETS_ANDA" di dalam kod HTML dengan URL Web App daripada Google Apps Script anda untuk menghantar data ke Google Sheets.');
+            return;
+        }
+        
+        // Jika URL telah diisi, borang akan dihantar menggunakan Apps Script secara latar belakang
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Menghantar...';
+
+        // Mengumpul data kategori yang ditandakan
+        const checkboxes = document.querySelectorAll('input[name="kategori"]:checked');
+        let kategoriSelected = [];
+        checkboxes.forEach((checkbox) => {
+            kategoriSelected.push(checkbox.value);
+        });
+
+        const formData = new FormData(this);
+        // Tukar senarai kategori menjadi teks dipisahkan koma untuk Google Sheets
+        formData.set('kategori', kategoriSelected.join(', '));
+
+        fetch(actionUrl, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors' // Diperlukan untuk Google Apps Script
+        })
+        .then(() => {
+            alert('✅ Aduan anda telah berjaya dihantar ke sistem!');
+            setInitialValues();
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Hantar Aduan';
+        })
+        .catch(error => {
+            alert('❌ Ralat semasa menghantar aduan. Sila cuba lagi.');
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Hantar Aduan';
+            console.error('Error:', error);
+        });
+    });
+</script>
+
+</body>
+</html>
